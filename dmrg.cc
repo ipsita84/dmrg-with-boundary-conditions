@@ -30,7 +30,7 @@
 
             ampo += 0.5,"S-",j,"S+",j+1;
 
-            ampo +=     "Sz",j,"Sz",j+1;
+            ampo += 1, "Sz",j,"Sz",j+1;
 
         }
           
@@ -39,7 +39,7 @@
 
          ampo += 0.5,"S-",1,"S+",N;
 
-         ampo +=     "Sz",1,"Sz",N;
+         ampo +=  1, "Sz",1,"Sz",N;
 
         auto H = MPO(ampo);
 
@@ -131,7 +131,7 @@
             }
 
             printfln("Across bond b=%d, SvN = %.10f",b,SvN);
-            myfile <<b<<SvN<<endl;
+            myfile <<b<<'\t'<<SvN<<std::endl;
 
         }
 
