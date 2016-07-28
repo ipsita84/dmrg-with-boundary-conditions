@@ -1,10 +1,12 @@
     #include "itensor/all.h"
 
+    #include <iostream>
+    #include <fstream>
+
      
 
     using namespace itensor;
-
-     
+    using namespace std ;
 
     int main()
 
@@ -31,6 +33,13 @@
             ampo +=     "Sz",j,"Sz",j+1;
 
         }
+          
+         // Periodic Boundary condition 
+         ampo += 0.5,"S+",1,"S-",N;
+
+         ampo += 0.5,"S-",1,"S+",N;
+
+         ampo +=     "Sz",1,"Sz",N;
 
         auto H = MPO(ampo);
 
@@ -67,7 +76,8 @@
         //across which we want to compute the von Neumann entanglement
 
      
-
+        ofstream myfile;
+        myfile.open ("entropy.txt");
         for (int b=1; b<psi.N(); b++){
 
      
@@ -121,13 +131,12 @@
             }
 
             printfln("Across bond b=%d, SvN = %.10f",b,SvN);
-
-     
+            myfile <<b<<SvN<<endl;
 
         }
 
+        myfile.close();
      
-
         return 0;
 
     }
