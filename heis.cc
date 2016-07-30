@@ -12,7 +12,7 @@
 
     {
 
-        int N = 100;
+        int N = 101;
 
      
 
@@ -26,20 +26,20 @@
 
         {
 
-            ampo += 0.5,"S+",j,"S-",j+1;
+            ampo += 1,"S+",j,"S-",j+1;
 
-            ampo += 0.5,"S-",j,"S+",j+1;
+            ampo += 1,"S-",j,"S+",j+1;
 
             ampo += 1, "Sz",j,"Sz",j+1;
 
         }
           
-         ampo += 0.5,"S+",1,"S-",N;
+         ampo += 1,"S+",1,"S-",N;
 
-         ampo += 0.5,"S-",1,"S+",N;
+         ampo += 1,"S-",1,"S+",N;
 
-        //ampo +=  1, "Sz",1,"Sz",N;  // Periodic Boundary condition 
-         ampo +=  -1, "Sz",1,"Sz",N;  // Anti-Periodic Boundary condition 
+        ampo +=  1, "Sz",1,"Sz",N;  // Periodic Boundary condition 
+        //ampo +=  -1, "Sz",1,"Sz",N;  // Anti-Periodic Boundary condition 
 
 
         auto H = MPO(ampo);
@@ -78,7 +78,7 @@
 
      
         ofstream myfile;
-        myfile.open ("entropy.txt");
+        myfile.open ("PBC-heis-iso-101.txt");
         for (int b=1; b<psi.N(); b++){
 
      

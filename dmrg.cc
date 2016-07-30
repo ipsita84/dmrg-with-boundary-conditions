@@ -4,79 +4,76 @@
 
     #include <iostream>
     #include <fstream>
-
-     
+    #include <boost/lexical_cast.hpp>     
 
     using namespace itensor;
     using namespace std ;
+    using boost::lexical_cast;
+    using boost::bad_lexical_cast;
 
     int main()
 
     {
 
-        int N = 100;
-        double h= 0.5; // h=1 is the critical point
+        double h=1.0; // h=1 is the critical point
+        
+        ofstream fout;
+        fout.open("Energy-TFIM-APBC.dat");// Opens a file for output
+
+        for (int N = 100; N < 1000; N +=11)
+	{
+     
+
+         auto sites = SpinHalf(N);
 
      
 
-        auto sites = SpinHalf(N);
+         auto ampo = AutoMPO(sites);
 
-     
+         for(int j = 1; j < N; ++j)
 
-        auto ampo = AutoMPO(sites);
-
-        for(int j = 1; j < N; ++j)
-
-        {
+         {
             ampo += -1, "Sz",j,"Sz",j+1;
             ampo += -h,"Sx",j;
 
-        }
+         }
          
          ampo += -h,"Sx",N;
 
-        ampo +=  1, "Sz",1,"Sz",N;  // Anti-Periodic Boundary condition 
+        //ampo +=  1, "Sz",1,"Sz",N;  // Anti-Periodic Boundary condition 
         // ampo +=  -1, "Sz",1,"Sz",N;  //Periodic Boundary condition 
 
 
-        auto H = MPO(ampo);
+         auto H = MPO(ampo);
+
+         auto sweeps = Sweeps(5); //number of sweeps is 5
+
+         sweeps.maxm() = 10,20,100,100,200;
+
+         sweeps.cutoff() = 1E-10;
+
+         auto psi = MPS(sites);
 
      
 
-        auto sweeps = Sweeps(5); //number of sweeps is 5
-
-        sweeps.maxm() = 10,20,100,100,200;
-
-        sweeps.cutoff() = 1E-10;
+         auto energy = dmrg(psi,H,sweeps);
 
      
 
-        auto psi = MPS(sites);
+         println("Ground State Energy = ",energy);
 
      
 
-        auto energy = dmrg(psi,H,sweeps);
+         //calculate the entanglement entropy here
+         //Given an MPS or IQMPS called "psi",
+         //and some particular bond "b" (1 <= b < psi.N())
+         //across which we want to compute the von Neumann entanglement
 
      
-
-        println("Ground State Energy = ",energy);
-
-     
-
-        //calculate the entanglement entropy here
-
-     
-
-        //Given an MPS or IQMPS called "psi",
-
-        //and some particular bond "b" (1 <= b < psi.N())
-
-        //across which we want to compute the von Neumann entanglement
-
-     
-        ofstream myfile;
-        myfile.open ("APBC-tfim.txt");
-        for (int b=1; b<psi.N(); b++){
+         string N_str = lexical_cast<string>(N);
+	 ofstream myfile(string("APBC-tfim-" + N_str + ".dat").c_str());// Opens a file for output
+        
+         for (int b=1; b<psi.N(); b++){
 
      
 
@@ -132,9 +129,12 @@
             myfile <<b<<'\t'<<SvN<<std::endl;
 
         }
+         myfile <<"GS energy"<<'\t'<<energy<<std::endl;
+         myfile.close();
 
-        myfile.close();
-     
-        return 0;
+         fout <<N<<'\t'<<energy<<std::endl;
+     }
+       fout.close(); 
+       return 0;
 
     }
